@@ -16,6 +16,12 @@ apply plugin: "java"
 apply plugin: "kotlin"
 apply plugin: "org.jmailen.kotlinter"
 
+sourceSets {
+    main.kotlin.srcDirs += "src/main/kotlin"
+    test.kotlin.srcDirs += "src/test/kotlin"
+    test.java.srcDirs += "src/test/kotlin"
+}
+
 repositories {
     mavenLocal()
     maven { url "https://repo.maven.apache.org/maven2" }
@@ -28,4 +34,28 @@ dependencies {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = "UTF-8"
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
+    kotlinOptions.freeCompilerArgs = ["-Xallow-result-return-type"]
+}
+
+compileTestKotlin {
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
+    kotlinOptions.freeCompilerArgs = ["-Xallow-result-return-type"]
+}
+
+kotlinter {
+    // gradle formatKotlin / gradle lintKotlin
+    // org.jmailen.gradle.kotlinter.KotlinterExtension
+    ignoreFailures = false
+    reporters = ['checkstyle']
+    experimentalRules = false
+    disabledRules = ["no-wildcard-imports"]
+}
+
+tasks.register('URLTest', JavaExec) {
+    main = 'url.URLTestKt'
+    classpath = sourceSets.main.runtimeClasspath
 }
